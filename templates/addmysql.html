@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="col-md-1"></div>
+    <div class="col-md-9">
+        <ul class="nav nav-tabs" >
+            <li role="presentation" id="MyClass" class="active"><a><span onclick="choice_table('MyClass')">班级表class</span></a></li>
+            <li role="presentation" id="MyStudent" ><a><span onclick="choice_table('MyStudent')">学生表student</span></a></li>
+            <li role="presentation" id="MyTeacher"><a><span onclick="choice_table('MyTeacher')">教师表teacher</span></a></li>
+            <li role="presentation" id="MyCourse"><a><span onclick="choice_table('MyCourse')">课程表course</span></a></li>
+            <li role="presentation" id="MyScore"><a><span onclick="choice_table('MyScore')">成绩表score</span></a></li>
+        </ul>
+        <table id="table" class="table table-striped">
+          {{ table_html | safe }}
+        </table>
+        <form>
+            <div class="form-group">
+                <label for="exampleInputEmail1">题目</label>
+                <textarea type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">答案</label>
+                <textarea type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"></textarea>
+            </div>
+
+            <div >
+                <input type="submit" class="btn btn-default" value="提交">
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2"></div>
+  <script>
+      function choice_table(id_name) {
+          $("#MyClass").removeClass("active");
+          $("#MyStudent").removeClass("active");
+          $("#MyTeacher").removeClass("active");
+          $("#MyCourse").removeClass("active");
+          $("#MyScore").removeClass("active");
+
+          $("#" + id_name).addClass("active");
+          $.ajax({
+              type: "get",
+              dataType: "json",
+              url: '/sqlobj/gettable/?tablename=' + id_name,
+              success: function (data) {
+                  $("#table").html(data.table_html)
+              }
+
+          })
+      }
+  </script>
+{% endblock %}
