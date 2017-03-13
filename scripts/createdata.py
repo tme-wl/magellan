@@ -248,7 +248,10 @@ def main():
 def run():
     import time
     T=time.time()
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)
     print(time.time()-T)
 
 
