@@ -18,7 +18,10 @@ from django.contrib import admin
 from magellan import settings
 
 urlpatterns = [
-    url(r'^media/(?P<path>.*)$','django.views.static.serve',{'document_root': settings.STATIC_ROOT}),
+
     url(r'^admin/', include(admin.site.urls)),
     url(r'^sqlobj/', include("sqlobj.urls")),
+    url(r'^mylogin/', include('login.urls')),
+    url('^', include('django.contrib.auth.urls')),
+    url(r'^$', 'magellan.views.home'),
 ]

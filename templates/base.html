@@ -9,6 +9,7 @@
 
     <!-- Bootstrap -->
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -17,11 +18,15 @@
       <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <script src="/static/js/jquery.js"></script>
+    <link href="/static/square/green.css" rel="stylesheet">
+    <script src="/static/js/icheck.js"></script>
   </head>
   <body>
 
 
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -31,13 +36,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">CodeJungle</a>
+      <a class="navbar-brand" href="/">CodeJungle</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">MySQL</a></li>
+        <li class="active"><a href="/sqlobj/mysqlpractice/">MySQL</a></li>
         <li><a href="#">MongoDB</a></li>
         <!--
         <li class="dropdown">
@@ -82,13 +87,19 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-  <div class="alert alert-success"  id="huadong"  role="alert" style="display:none;position: absolute;width:100%;top:0px;z-index:10"><p id="alert" style="margin-left: 40px;margin-right:40px; "></p></div>
-  <div class="row">
+  <div class="alert alert-success"  id="huadong"  role="alert" style="display:none;position: absolute;width:100%;top:0px;z-index:10">
+      <p id="alert" style="margin-left: 40px;margin-right:40px; "></p>
+  </div>
 
+  <div class="container-fluid">
+  <div class="row">
   {% block content %}{% endblock %}
   </div>
+  </div>
+
   <hr>
-  <div class="row>" style="background: #cccccc">
+  <div class="container-fluid">
+  <div class="row" >
       <div>
       <div class="col-md-1"></div>
       <div class="col-md-9" >
@@ -101,14 +112,16 @@
       <div class="col-md-2"></div>
       </div>
   </div>
+      </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  <!--
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>-->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <!--
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script>
+  -->
 
-  </script>
   </body>
 </html>

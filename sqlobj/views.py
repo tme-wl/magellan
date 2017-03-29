@@ -47,9 +47,18 @@ def get_table(request):
     return ajaxresponse({"table_html": get_table_html(tablename)})
 
 
-def mysqlpractice(request):
+def mysqlpractice(request, num=1):
     table_html = get_table_html("MyClass")
-    return render (request,"mysqlpractice.html",{"table_html":table_html})
+    myurl = request.path
+    urllist = myurl.split('/')
+    if urllist[3] == '':
+        urllist[3]=1
+    if int(urllist[3]) <= 0:
+        urllist[3] = 1
+    newurl = '/' + urllist[1]+"/"+urllist[2]+'/'+str(urllist[3]) + '/'
+    msg={"table_html":table_html,'myurl':newurl}
+    msg.update(getquestion(num))
+    return render (request,"mysqlpractice.html",msg)
 
 
 def addmysql(request):
@@ -60,24 +69,26 @@ def addmysql(request):
         return render (request, "addmysql.html",{"table_html":table_html})
 
 
-def getquestion(request):
-    question_id = int(request.GET.get("question", 0))
-    if question_id == 0:
+def getquestion(num):
+    question_id = int(num)
+    if question_id <= 0:
         question_id = 1
     Questionobj = Question.objects.order_by('id').last()
     if Questionobj.id < question_id:
         text = '你刷完所有题目咯。'
         id = Questionobj.id
-        return ajaxresponse({"question": text, "id": id})
+        return {"question": text, "id": id, 'questionclass':3}
     try:
         obj = Question.objects.get(id = question_id)
         text = obj.text
         id = obj.id
+        qclass = obj.qclass
     except:
         text = '对不起，没有这道题。'
-        id = 0
+        id = 1
+        qclass = ''
     finally:
-        return ajaxresponse({"question": text, "id":id})
+        return {"question": text, "id":id, 'questionclass':qclass}
 
 
 def get_sql_time(cur,mysql):
@@ -101,33 +112,66 @@ def uploadmysql(request):
     con = connections["default"]
     cur = con.cursor()
     questionid = int(request.POST.get('questionid', 0))
-    mysqlstr = request.POST.get('mysql', '')
-    obj = Question.objects.get(id=questionid)
-    if mysqlstr and id:
-        try:
-            cur.execute(mysqlstr)
-            myanswer, usetime = get_sql_time(cur, mysqlstr)
-            theanswer = eval(obj.theanswer)
-            if theanswer == myanswer:
-                answerobj = Answer.objects.filter(question=questionid).order_by('usetime')
-                if answerobj:
-                    msg = {"head":"ok","info": "恭喜你答对了,用时%s毫秒,历史最快%s毫秒" % (str(usetime), str(answerobj[0].usetime)) }
+    print(questionid)
+    qclass = int(request.POST.get('qclass'), 0)
+    if qclass ==1 and questionid:   #sqlyuju
+        print(1)
+        mysqlstr = request.POST.get('mysql', '')
+        if not mysqlstr:
+            msg = {"head": "error", 'info': '参数错误'}
+        else:
+            try:
+                obj = Question.objects.get(id=questionid)
+                cur.execute(mysqlstr)
+                myanswer, usetime = get_sql_time(cur, mysqlstr)
+                cur.execute(obj.answersql)
+                theanswer = cur.fetchall()
+                if theanswer == myanswer:
+                    answerobj = Answer.objects.filter(question=questionid)
+                    if answerobj:
+                        msg = {"head": "ok", "info": "恭喜你答对了,用时%s毫秒,历史最快%s毫秒" % (str(usetime), str(answerobj[0].usetime))}
+                        if answerobj[0].usetime > float(usetime):
+                            answerobj[0].usetime = float(usetime)
+                            answerobj[0].name = '匿名'
+                            answerobj[0].save()
+                    else:
+                        ans = Answer()
+                        ans.question = obj
+                        ans.sqltext = mysqlstr
+                        ans.name = '匿名'
+                        ans.usetime = float(usetime)
+                        ans.save()
+                        msg = {"head": "ok", "info": "恭喜你答对了,用时%s毫秒." % (str(usetime),)}
                 else:
-                    msg = {"head": "ok", "info": "恭喜你答对了,用时%s毫秒." % (str(usetime), )}
+                    msg = {"head": "error", 'info': '答案错误'}
+            except Exception as e:
+                msg = {"head": "error", "info": 'sql错误:' + str(e)}
+    elif qclass == 2 and questionid:  #choice
+        print(2)
+        qchoice = int(request.POST.get('qchoice'), 0)
+        try:
+            obj = Question.objects.get(id=questionid)
+            if qchoice and qchoice == obj.thechoice:
+                msg = {'head': 'ok', 'info': '恭喜你答对了'}
             else:
-                msg = {"head":"error",'info': '答案错误'}
+                msg = {'head': 'ok', 'info': '回答错误'}
         except Exception as e:
-            msg = {"head":"error","info":'sql错误:' + str(e)}
+            msg = {"head": "error", "info": '错误:' + str(e)}
     else:
-        msg = {"head":"error",'info':"参数错误"}
+        print(3)
+        msg = {"head": "error", 'info': '参数错误'}
     if cur:
         cur.close()
     if con:
         con.close()
     return ajaxresponse(msg)
 
+
 def getanswer(request):
     questionid = int(request.GET.get('questionid', 0))
     obj = Question.objects.get(id=questionid)
-    msg = {"html":obj.answersql}
+    msg = {"html":obj.answersql,'qclass':obj.qclass,'qchoice':obj.thechoice}
     return ajaxresponse(msg)
+
+def test(request):
+    return render(request,'test.html')

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-
     <div class="col-md-1"></div>
     <div class="col-md-9">
         <ul class="nav nav-tabs" >
@@ -21,11 +20,9 @@
         <div class="col-md-2">
             <div class="input-group">
                 <span class="input-group-addon">第</span>
-                <input type="text" id="number" class="form-control"  value="1">
+                <input type="text" id="number" class="form-control"  value="{{ id }}">
                 <span class="input-group-addon">题</span>
 
-                <!--
-                <input  onclick="getquestion()"  type="button"  class="btn btn-default" value="确定">-->
             </div>
         </div>
 
@@ -46,145 +43,39 @@
 
         <div class="jumbotron" style="width:80%;height:150px;float: left;margin-bottom: 0px;">
             <div class="container">
-                <p id="question">本校一共多少学生？</p>
+                <p id="question">{{ question }}</p>
             </div>
         </div>
         <div style="width:10%;height:150px;background-color: #ededed;float: left;display: table-cell;vertical-align: middle;text-align: right;">
             {% load staticfiles %}
             <img onclick="next()" style="width:80px;height:80px;margin-top:30px;margin-bottom: 30px;" src="{% static 'xiayige.png' %}">
         </div>
-        <input style="display: none;" id="questionid" name="questionid" value="0">
+        <input style="display: none" id="questionid" name="questionid" value="{{ id }}">
+        <input style="display: none" id="questionclass" name="questionclass" value="{{ questionclass }}">
+        <input style="display: none" id="myurl" name="myurl" value="{{ myurl }}">
         <form >
-        <div class="form-group">
-            <label for="mysql" style="margin-top:30px">MySQL:</label>
-            <textarea id="mysql" name="mysql" class="form-control" style="width: 100%;height: 130px;font-size:18px;"></textarea>
-            <br>
-            <div style="text-align:right">
+            {% if questionclass == 1 %}
+            <div class="form-group" id="sqlyuju">
+                <label for="mysql" style="margin-top:30px">MySQL:</label>
+                <textarea id="mysql" name="mysql" class="form-control" style="width: 100%;height: 130px;font-size:18px;"></textarea>
+                <br>
+            </div>
+            {% else %}
+                {% if questionclass == 2 %}
+                    <label for="mysql" style="margin-top:30px">选择:</label>
+            <div class="form-group" id="sqlchoice" style="margin-left:30px;margin-top:10px;">
+                <input type="radio" name="iCheck" value="1"  id="checka"> A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="iCheck" value="2"  id="checkb"> B
+            </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="form-group" style="text-align:right">
                 <input type="button" class="btn btn-default" onclick="uploadmysql()" value="提交">
             </div>
-        </div>
         </form>
     </div>
     <div class="col-md-2"></div>
 
-
-
-  <script type="application/javascript">
-
-      function choice_table(id_name) {
-          $("#MyClass").removeClass("active");
-          $("#MyStudent").removeClass("active");
-          $("#MyTeacher").removeClass("active");
-          $("#MyCourse").removeClass("active");
-          $("#MyScore").removeClass("active");
-
-          $("#" + id_name).addClass("active");
-          $.ajax({
-              type: "get",
-              dataType: "json",
-              url: '/sqlobj/gettable/?tablename=' + id_name,
-              success: function (data) {
-                  $("#table").html(data.table_html)
-              }
-
-          })
-      }
-
-      function getnowquestion(){
-          var number = $("#number").val();
-          getquestion(number);
-      }
-      function getquestion(number){
-
-          $.ajax({
-              type: "get",
-              dataType: "json",
-              url: '/sqlobj/getquestion/?question=' + number,
-              success: function (data) {
-                  $("#question").text(data.question);
-                  $("#questionid").val(data.id);
-                  $("#number").val(data.id);
-                  $("#mysql").val('');
-              }
-
-          })
-
-      }
-
-      function getanswer(){
-          var questionid = $("#questionid").val();
-          $.ajax({
-              type:'GET',
-              dataType: "json",
-              url:'/sqlobj/getanswer/',
-              data:{"questionid":questionid},
-              success:function(data){
-                  $("#mysql").val(data.html);
-                  }
-          })
-      }
-      function uploadmysql(){
-          var questionid = $("#questionid").val();
-          var mysql = $("#mysql").val();
-          $.ajax({
-              type:'POST',
-              dataType: "json",
-              url:'/sqlobj/uploadmysql/',
-              data:{"mysql":mysql,"questionid":questionid},
-              success:function(data){
-                  if(data.head == 'ok'){
-                      $("#huadong").css("background-color","#dff0d8");
-                      $("#huadong").css("border-color","#d6e9c6;");
-                  }else{
-
-                      $("#huadong").css("background-color","#edd");
-                      $("#huadong").css("border-color","#eed;");
-                  }
-
-                  $("#alert").html(data.info);
-                  $("#huadong").css("display","block");
-                  setTimeout(function() { $("#huadong").css("display","none"); }, 2000);
-
-              }
-
-          })
-      }
-      function previous(){
-          var qid = parseInt($("#questionid").val())-1;
-          getquestion(qid)
-
-      }
-
-      function next(){
-          var qid = parseInt($("#questionid").val())+1;
-          getquestion(qid)
-
-      }
-
-
-  window.onload=function(){ getnowquestion(); scrop();}
-
-      function scrop(){
-        var the_hight_px = $(this).scrollTop();
-        $("#huadong").css("top",the_hight_px+"px");
-
-        $(window).scroll(function() {
-            var the_hight_px = $(this).scrollTop();
-                $("#huadong").css("top",the_hight_px+"px");
-        });
-
-        /*
-        document.addEventListener("touchmove", touchMove, false);
-        function touchMove(event){
-            var wl = $(this).scrollTop();
-            if (wl >= hdgd){
-                $("#huadong").css("z-index","10");
-                $("#huadong").css("top",wl-py+"px");
-            }else{
-                $("#huadong").css("z-index","-10");
-            }
-        };*/
-    }
-
-  </script>
+<script src="/static/js/sqlobj/mysqlpractice.js"></script>
 {% endblock %}
