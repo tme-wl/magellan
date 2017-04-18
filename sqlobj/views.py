@@ -74,6 +74,7 @@ def getquestion(num):
     if question_id <= 0:
         question_id = 1
     Questionobj = Question.objects.order_by('id').last()
+    #有bug
     if Questionobj.id < question_id:
         text = '你刷完所有题目咯。'
         id = Questionobj.id

@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'sqlobj',
+    'login',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -101,7 +102,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'zh-CN'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -114,4 +115,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/staticmedia/'
+STATIC_ROOT = 'staticmedia/'
+STATICFILES_DIRS = (
+    "/Users/tme/myobject/gitmagellan/mystatic/",
+)
