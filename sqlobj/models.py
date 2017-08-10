@@ -2,6 +2,7 @@
 from django.db import models
 
 # Create your models here.
+from django.contrib.auth.models import User
 
 
 class MyClass(models.Model):
@@ -34,6 +35,7 @@ class MyCourse(models.Model):
     """课程表"""
     cname = models.CharField("课程", max_length=3)
     myteacher = models.ForeignKey(MyTeacher)
+
     class Meta:
         db_table = 'course'
 
@@ -51,19 +53,18 @@ class MyScore(models.Model):
 
 class Question(models.Model):
     """mysql题目"""
-    QCLASS = ((1, 'sql语句'),(2, '选择题'))
+    QCLASS = ((1, 'sql语句'), (2, '选择题'))
     CHOICE = ((1, 'A'), (2, 'B'))
-    text = models.CharField("题目",max_length=300)
-    difficulty = models.IntegerField('难度等级',default=0)
-    answernumber = models.IntegerField('答案个数',default=0)
-    theanswer = models.CharField('答案',max_length=100)
-    answersql = models.CharField('sql语句',max_length=300,default='')
-    qclass = models.IntegerField('题目类型',choices=QCLASS, default=1)
-    thechoice = models.IntegerField('选择',choices=CHOICE, default=1)
-    achoice = models.CharField('A选项',max_length=20,default='')
-    bchoice = models.CharField('B选项',max_length=20,default='')
+    text = models.CharField("题目", max_length=300)
+    difficulty = models.IntegerField('难度等级', default=0)
+    answernumber = models.IntegerField('答案个数', default=0)
+    theanswer = models.CharField('答案', max_length=100)
+    answersql = models.CharField('sql语句', max_length=300,default='')
+    qclass = models.IntegerField('题目类型', choices=QCLASS, default=1)
+    thechoice = models.IntegerField('选择', choices=CHOICE, default=1)
+    achoice = models.CharField('A选项', max_length=20,default='')
+    bchoice = models.CharField('B选项', max_length=20,default='')
     info = models.CharField('备注', default='', max_length=20)
-
 
 
 class Answer(models.Model):
