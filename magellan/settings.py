@@ -90,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'magellan',
         'USER': 'root',
-        'PASSWORD': '768752',
+        'PASSWORD': '068752',
         'PORT': '3306',
         'HOST': '127.0.0.1'
     }
@@ -116,6 +116,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticmedia/'
-STATICFILES_DIRS = (
-    "/Users/tme/myobject/gitmagellan/mystatic/",
-)
+from magellan.local_settings import *
