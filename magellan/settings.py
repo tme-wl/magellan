@@ -85,16 +85,16 @@ WSGI_APPLICATION = 'magellan.wsgi.application'
 }
 """
 
-DATABASES = {
-    'default':{
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'magellan',
-        'USER': 'root',
-        'PASSWORD': '068752',
-        'PORT': '3306',
-        'HOST': '127.0.0.1'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'magellan',
+#         'USER': 'root',
+#         'PASSWORD': '068752',
+#         'PORT': '3306',
+#         'HOST': '127.0.0.1'
+#     }
+# }
 
 
 # Internationalization
@@ -113,7 +113,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 STATIC_URL = '/static/'
-STATIC_ROOT = 'staticmedia/'
-from magellan.local_settings import *
+# STATIC_URL = '/static/'
+# STATIC_ROOT = 'staticmedia/'
+# STATICFILES_DIRS = (
+#     "/Users/tme/myobject/gitmagellan/mystatic/",
+# )
+
+try:
+    from magellan.local_settings import *
+except ImportError:
+    print("local_settings not found, run at default settings")

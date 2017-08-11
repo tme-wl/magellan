@@ -4,4 +4,6 @@ import requests
 
 
 def home(request):
-    return render(requests,'home.html')
+    print('in home')
+    return HttpResponse('okkk')
+    # return render(requests, 'home.html')
