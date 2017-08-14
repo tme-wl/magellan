@@ -16,6 +16,7 @@ def ajaxresponse(ret):
 
 
 def get_table_html(table_name):
+    """获取mysql的基本数据表"""
     forverginkey = ['myclass', 'myteacher', 'mystudent', 'mycourse']
     title_name_obj = get_model('sqlobj', table_name)
     title_name = []
@@ -30,9 +31,11 @@ def get_table_html(table_name):
         table_thead_son1 += "<th>%s</th>" % son[0]
     for son in title_name:
         table_thead_son2 += "<th>%s</th>" % son[1]
+    # 表格头部
     table_thead_html = "<thead><tr>%s</tr><tr>%s</tr></thead>" % (table_thead_son2, table_thead_son1)
 
     obj = eval(table_name + ".objects.all()[:30]")
+    # 表身
     html_tbody = ""
     for son in obj:
         html_son = ""
@@ -51,7 +54,8 @@ def get_table(request):
     return ajaxresponse({"table_html": get_table_html(tablename)})
 
 
-def mysqlpractice(request, num=1):
+def mysql_practice(request, num=1):
+    """获取mysql页面以及基本数据"""
     table_html = get_table_html("MyClass")
     myurl = request.path
     urllist = myurl.split('/')
@@ -74,6 +78,7 @@ def addmysql(request):
 
 
 def getquestion(num):
+    """获取第num题"""
     question_id = int(num)
     if question_id <= 0:
         question_id = 1
@@ -97,6 +102,13 @@ def getquestion(num):
 
 
 def get_sql_time(cur, mysql):
+    """
+    获取mysql语句执行的时间
+    若时间短 执行10次 取平均时间
+    :param cur: 
+    :param mysql: 
+    :return: 
+    """
     T = time.time()
     cur.execute(mysql)
     answer = cur.fetchall()
@@ -117,10 +129,9 @@ def uploadmysql(request):
     con = connections["default"]
     cur = con.cursor()
     questionid = int(request.POST.get('questionid', 0))
-    print(questionid)
+    # 题目类型 qclass=1为填空题 2位选择题
     qclass = int(request.POST.get('qclass'), 0)
     if qclass == 1 and questionid:  # sqlyuju
-        print(1)
         mysqlstr = request.POST.get('mysql', '')
         if not mysqlstr:
             msg = {"head": "error", 'info': '参数错误'}
@@ -153,7 +164,6 @@ def uploadmysql(request):
             except Exception as e:
                 msg = {"head": "error", "info": 'sql错误:' + str(e)}
     elif qclass == 2 and questionid:  # choice
-        print(2)
         qchoice = int(request.POST.get('qchoice'), 0)
         try:
             obj = Question.objects.get(id=questionid)

@@ -15,14 +15,16 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from magellan import settings
+from magellan import views
+from sqlobj import views as sqlviews
 
 urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^sqlobj/', include("sqlobj.urls")),
     url(r'^mylogin/', include('login.urls')),
-    url(r'^$', 'magellan.views.home'),
+    # url(r'^$', sqlviews.mysql_practice),
+    url(r'^$', views.home),
     # url('^', include('django.contrib.auth.urls')),
 
 ]
