@@ -52,10 +52,17 @@ class MyScore(models.Model):
 
 
 class Question(models.Model):
-    """mysql题目"""
+    """
+    mysql题目
+    
+    题目分两种, 一种为选择题，a b 两个选项，
+    一种为答题，自行输入sql语句
+    答题状态下，应该有必须用什么关键字，以及不能用什么关键字等限制
+    """
     QCLASS = ((1, 'sql语句'), (2, '选择题'))
     CHOICE = ((1, 'A'), (2, 'B'))
     text = models.CharField("题目", max_length=300)
+    # 难度级别，可让用户选择
     difficulty = models.IntegerField('难度等级', default=0)
     answernumber = models.IntegerField('答案个数', default=0)
     theanswer = models.CharField('答案', max_length=100)
@@ -64,7 +71,12 @@ class Question(models.Model):
     thechoice = models.IntegerField('选择', choices=CHOICE, default=1)
     achoice = models.CharField('A选项', max_length=20, default='')
     bchoice = models.CharField('B选项', max_length=20, default='')
-    type = models.IntegerField("题目类型", choices=Question_type, default=0)
+    # 题目等级类型,进阶 入门 成长，提升等
+    type = models.IntegerField("题目等级类型", choices=Question_type, default=0)
+    # 限制 0不限制 1为必须键入关键字 2为不能使用关键字
+    limit = models.IntegerField("题目限制", default=0, null=True)
+    key_word = models.CharField("关键字", max_length='30', default='', null=True)
+    # 题目备注
     info = models.CharField('备注', default='', max_length=20)
 
 

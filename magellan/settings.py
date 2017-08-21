@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Django settings for magellan project.
 
@@ -40,6 +42,9 @@ INSTALLED_APPS = (
     # 'django_extensions',
     'sqlobj',
     'login',
+    # 'xadmin',
+    # 'crispy_forms',
+    # 'reversion',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -100,16 +105,14 @@ WSGI_APPLICATION = 'magellan.wsgi.application'
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'zh-CN'
-
-TIME_ZONE = 'Asia/Shanghai'
+LANGUAGE_CODE = 'zh-Hans'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
-
+TIME_ZONE = 'Asia/Shanghai'     # 时区
+USE_TZ = False      # 使用本地时间，而不是UTC时间
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/

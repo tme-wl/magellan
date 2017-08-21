@@ -1,3 +1,4 @@
+# coding=utf-8
 
 # 题目类型
 Question_type = (

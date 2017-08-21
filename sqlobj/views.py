@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from django.shortcuts import render
 from sqlobj.models import *
 from django.db.models.loading import get_model
