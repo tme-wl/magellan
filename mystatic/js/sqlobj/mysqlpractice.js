@@ -2,7 +2,7 @@
  * Created by tme on 2017/3/24.
  */
 
-$(document).ready(function(){
+$(document).ready(function () {
   $('#checka').iCheck({
     checkboxClass: 'icheckbox_square-green',
     radioClass: 'iradio_square-green',

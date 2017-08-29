@@ -1,9 +1,11 @@
 # -*- coding:utf-8 -*-
 import random
-from django.db import connections
 from sqlobj.models import MyClass, MyStudent, MyTeacher, MyCourse, MyScore
-import sys
+from django.core.management.base import BaseCommand
 import logging
+import time
+import sys
+
 logger = logging.getLogger("magellan")
 
 print(sys.getdefaultencoding())
@@ -71,14 +73,6 @@ course_required = ["语文", "数学", "外语"]
 
 exam_name = ["半期", '期末']
 
-import csv
-
-class_path = '/Users/tme/Desktop/myclass.csv'
-student_path = '/Users/tme/Desktop/mystudent.csv'
-teacher_path = '/Users/tme/Desktop/myteacher.csv'
-source_path = '/Users/tme/Desktop/mysource.csv'
-score_path = '/Users/tme/Desktop/myscore.csv'
-
 
 def choice_name():
     """生成一个名字"""
@@ -94,13 +88,14 @@ def choice_name():
 
 def create_class():
     """创建class表"""
-    print('create class data')
+    logger.info("create class data")
     MyClass.objects.bulk_create([MyClass(caption=the_class) for the_class in my_class])
-    print("create class end")
+    logger.info("create class end")
 
 
 def create_student():
     """插入学生数据"""
+    logger.info("create student data")
     student_obj = []
     my_class = MyClass.objects.all()
     for cla in my_class:
@@ -108,6 +103,7 @@ def create_student():
             # 一个班30 - 40人
             student_obj.append(MyStudent(sname=choice_name(), gender=random.choice(["男", "女"]), myclass_id=cla.id))
     MyStudent.objects.bulk_create(student_obj)
+    logger.info("create student end")
 
 
 def create_teacher():
@@ -115,8 +111,10 @@ def create_teacher():
     创建教师表
     course_required 必修课 全校每门必修课安排6个老师
     """
+    logger.info("create teacher data")
     MyTeacher.objects.bulk_create(
-        [MyTeacher(cname=choice_name()) for x in range(len(course_required) * 3)])
+        [MyTeacher(tname=choice_name()) for x in range(len(course_required) * 6)])
+    logger.info("create teacher end")
 
 
 def create_course():
@@ -124,6 +122,7 @@ def create_course():
     创建课程表
 
     """
+    logger.info("create course data")
     teachers = MyTeacher.objects.all()
     course = []
     number = 0
@@ -132,6 +131,7 @@ def create_course():
             course.append(MyCourse(cname=co, myteacher_id=teachers[number].id))
             number += 1
     MyCourse.objects.bulk_create(course)
+    logger.info("create course end")
 
 
 def create_score():
@@ -139,6 +139,7 @@ def create_score():
     创建成绩表
     :return: 
     """
+    logger.info("create score data")
     students = MyStudent.objects.all()
     courses = MyCourse.objects.all()
     score = []
@@ -150,6 +151,23 @@ def create_score():
                 # 考试
                 score.append(MyScore(mystudent_id=st.id, mycourse_id=co.id, test=exam, number=random.randint(50, 100)))
     MyScore.objects.bulk_create(score)
+    logger.info("create score end")
+
+
+class Command(BaseCommand):
+    """把QUESTION_ANSWER里的问题和答案导入到数据库里，去掉重复的和已经导入的"""
+    def handle(self, *args, **options):
+        """"""
+        print("run create_teacher")
+        a = time.time()
+        create_class()
+        create_student()
+        create_teacher()
+        create_course()
+        create_score()
+        print(time.time() - a)
+        print("end create_teacher")
+
 
 # def create_class_csv1():
 #     """创建clss表"""
@@ -484,7 +502,6 @@ def create_score():
 #
 # docker run -d -p 223:22 -p 7335:7331 -p 9299:9292 --name arachni1 -e SERVER_ROOT_PASSWORD="DockerArachniPWD"  -e ARACHNI_PARAMS="" arachni/arachni:latest
 
-if __name__ == '__main__':
-    print("run create_teacher")
-    logging.info("testtest")
-    print("end create_teacher")
+
+
+

@@ -90,16 +90,16 @@ WSGI_APPLICATION = 'magellan.wsgi.application'
 }
 """
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'magellan',
-#         'USER': 'root',
-#         'PASSWORD': '068752',
-#         'PORT': '3306',
-#         'HOST': '127.0.0.1'
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'magellan',
+        'USER': 'root',
+        'PASSWORD': '068752',
+        'PORT': '3306',
+        'HOST': '127.0.0.1'
+    }
+}
 
 
 # Internationalization
@@ -123,6 +123,50 @@ STATIC_URL = '/static/'
 #     "/Users/tme/myobject/gitmagellan/mystatic/",
 # )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s %(module)s %(process)d %(thread)d %(filename)s:%(lineno)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'magellan': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/magellan/magellan.log',
+            'formatter': 'verbose',
+        },
+
+    },
+    'loggers': {
+        'console': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'magellan': {
+            'handlers': ['magellan'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+    }
+}
 try:
     from magellan.local_settings import *
 except ImportError:
