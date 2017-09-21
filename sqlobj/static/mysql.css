@@ -1,0 +1,14 @@
+
+.pagination {
+    float:right;
+}
+
+.menu li {
+    width: 25px;
+    float:left; /* 往左浮动 */
+    list-style: none;
+}
+.menu li a {
+    color: #000;
+    background-color: #fff !important;
+}

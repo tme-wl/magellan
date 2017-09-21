@@ -63,8 +63,7 @@ ROOT_URLCONF = 'magellan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join((os.path.join(BASE_DIR, 'templates')), 'tables')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

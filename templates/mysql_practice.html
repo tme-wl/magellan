@@ -10,12 +10,13 @@
             <li role="presentation" id="MyCourse"><a><span onclick="choice_table('MyCourse')">课程表course</span></a></li>
             <li role="presentation" id="MyScore"><a><span onclick="choice_table('MyScore')">成绩表score</span></a></li>
         </ul>
-        <div style=" overflow:scroll; width:100%; height:300px;">
-            <table id="table" class="table table-striped">
+        <div id = 'table'>
+        {#<div style=" overflow:scroll; width:100%; height:300px;">#}
                 {{ table_html | safe }}
-            </table>
         </div>
-        <br><hr>
+        <br>
+    <br>
+        <hr>
 
         <div class="col-md-2">
             <div class="input-group">

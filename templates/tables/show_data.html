@@ -1,0 +1,31 @@
+
+<!--表格,渲染my_data数据-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+          {% for name in title_name %}
+            <th>{{ name.0 }}</th>
+          {% endfor %}
+
+        </tr>
+        <tr>
+          {% for name in title_name %}
+            <th>{{ name.1 }}</th>
+          {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for son in my_data %}
+        <tr>
+            {% for name in son %}
+            <td>{{ name }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!--引入分页-->
+{% if pagination %}
+    {% include "pagination.html" %}
+{% endif %}

@@ -28,10 +28,10 @@ $(document).ready(function () {
               dataType: "json",
               url: '/sqlobj/gettable/?tablename=' + id_name,
               success: function (data) {
-                  $("#table").html(data.table_html)
+                  $("#table").html(data.table_html);
               }
 
-          })
+          });
       }
 
       function getnowquestion(){

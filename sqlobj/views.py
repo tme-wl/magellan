@@ -1,24 +1,33 @@
 # coding=utf-8
 
 from django.shortcuts import render
-from sqlobj.models import *
+from sqlobj.models import Question, Answer, MyClass, MyStudent, MyTeacher, MyCourse, MyScore
 from django.db.models.loading import get_model
 from django.http import HttpResponse
 from django.db import connections
 import json
 from django.views.decorators.csrf import csrf_exempt
 import time
+import logging
+from django.template import Context, Template
+from common.pagination import Pagination
+from django.template.loader import get_template
+from django.forms.models import model_to_dict
+logger = logging.getLogger("magellan")
 
 
 # Create your views here.
-
 
 def ajaxresponse(ret):
     return HttpResponse(content=json.dumps(ret), content_type="application/json")
 
 
-def get_table_html(table_name):
-    """获取mysql的基本数据表"""
+def get_table_html(request, table_name):
+    """
+    获取mysql的基本数据表
+    :param table_name: 
+    :return: 
+    """
     forverginkey = ['myclass', 'myteacher', 'mystudent', 'mycourse']
     title_name_obj = get_model('sqlobj', table_name)
     title_name = []
@@ -27,38 +36,43 @@ def get_table_html(table_name):
             field.name = field.name + "_id"
             field.verbose_name = field.verbose_name + "(外键)"
         title_name.append([field.name, field.verbose_name])
-    table_thead_son1 = ""
-    table_thead_son2 = ""
-    for son in title_name:
-        table_thead_son1 += "<th>%s</th>" % son[0]
-    for son in title_name:
-        table_thead_son2 += "<th>%s</th>" % son[1]
-    # 表格头部
-    table_thead_html = "<thead><tr>%s</tr><tr>%s</tr></thead>" % (table_thead_son2, table_thead_son1)
+    return_data = eval(table_name + ".objects.all()")
+    obj = Pagination(request, len(return_data))
+    start = obj.start()
+    end = obj.end()
+    pagination = obj.pagination()
+    my_data = []
+    for son in return_data[start: end]:
+        temp = []
+        for name in title_name:
+            temp.append(model_to_dict(son).get(name[0]))
+        my_data.append(temp)
 
-    obj = eval(table_name + ".objects.all()[:30]")
-    # 表身
-    html_tbody = ""
-    for son in obj:
-        html_son = ""
-        for i in title_name:
-            html_son += "<td>%s</td>" % getattr(son, i[0])
-        html_tbody += "<tr>%s</tr>" % html_son
-    html_son = ""
-    for i in title_name:
-        html_son += "<td>...</td>"
-    html_tbody += "<tr>%s</tr>" % html_son
-    return table_thead_html + "<tbody>%s</tbody>" % html_tbody
+    msg = {"my_data": my_data, "pagination": pagination, 'title_name': title_name}
+    # 获取模板 渲染模板
+    template = get_template("show_data.html")
+    context = Context(msg)
+    html = template.render(context)
+    return html
 
 
 def get_table(request):
-    tablename = request.GET.get("tablename", '')
-    return ajaxresponse({"table_html": get_table_html(tablename)})
+    """
+    视图函数,演示分页功能,
+    reurn_data为所有的数据列表,里面一list形式装载所有数据
+    这里演示为从Models里面取出的所有数据
+    """
+    table_name = request.GET.get("tablename", '')
+    if not table_name:
+        logger.warning("查询表格的时候没有传入表格名称")
+        return ajaxresponse({"table_html": ''})
+    return ajaxresponse({"table_html": get_table_html(request, table_name)})
 
 
 def mysql_practice(request, num=1):
     """获取mysql页面以及基本数据"""
-    table_html = get_table_html("MyClass")
+    # 获取数据表格table
+    table_html = get_table_html(request, "MyClass")
     myurl = request.path
     urllist = myurl.split('/')
     if urllist[3] == '':
@@ -67,8 +81,16 @@ def mysql_practice(request, num=1):
         urllist[3] = 1
     newurl = '/' + urllist[1] + "/" + urllist[2] + '/' + str(urllist[3]) + '/'
     msg = {"table_html": table_html, 'myurl': newurl}
+    # 获取第num题
     msg.update(getquestion(num))
-    return render(request, "mysqlpractice.html", msg)
+    # msg = {
+    #     "table_html"
+    #     "myurl"
+    #     "question"
+    #     "id"
+    #     "questionclass"
+    # }
+    return render(request, "mysql_practice.html", msg)
 
 
 def addmysql(request):
@@ -84,11 +106,14 @@ def getquestion(num):
     question_id = int(num)
     if question_id <= 0:
         question_id = 1
-    Questionobj = Question.objects.order_by('id').last()
+    question_obj = Question.objects.order_by('id').last()
     # 有bug
-    if Questionobj.id < question_id:
+    if not question_obj:
+        logger.warning("Question未查到数据")
+        return {"question": "", "id": 0, "questionclass": ''}
+    if question_obj.id < question_id:
         text = '你刷完所有题目咯。'
-        id = Questionobj.id
+        id = question_obj.id
         return {"question": text, "id": id, 'questionclass': 3}
     try:
         obj = Question.objects.get(id=question_id)
@@ -176,7 +201,6 @@ def uploadmysql(request):
         except Exception as e:
             msg = {"head": "error", "info": '错误:' + str(e)}
     else:
-        print(3)
         msg = {"head": "error", 'info': '参数错误'}
     if cur:
         cur.close()

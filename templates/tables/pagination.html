@@ -1,0 +1,51 @@
+
+<div style="" class="pagination">
+      <ul class="menu">
+          <li >
+              <a href="{{pagination.pagenav}}page={{pagination.previous}}&hits={{pagination.hits}}"><<</a>
+          </li>
+                {% for pagenum in pagination.pagelist %}
+                    {% if pagenum %}
+        	            {% ifequal pagenum pagination.page %}
+                            <li >
+                                <a href="javascript:void(0);" style="color:#5CACEE;background-color:#ba1a22;">{{pagenum}}</a>
+                            </li>
+                        {% else %}
+                          <!--
+                            <li>
+                                <a href="{{pagination.pagenav}}page={{pagenum}}&hits={{pagination.hits}}" >{{pagenum}}</a>
+                                <a href="{{pagination.pagenav}}page={{pagenum}}&hits={{pagination.hits}}" >{{pagenum}}</a>
+                            </li>
+                            -->
+                          <li>
+                             <a onclick=' re_table("{{pagination.pagenav}}page={{pagenum}}&hits={{pagination.hits}}") ' >{{pagenum}}</a>
+                          </li>
+                        {% endifequal %}
+                    {% else %}
+                            <li>
+                                <a href="#" >...</a>
+                            </li>
+                    {% endif %}
+                {% endfor %}
+          <li >
+              <a href="{{pagination.pagenav}}page={{pagination.next}}&hits={{pagination.hits}}">>></a>
+          </li>
+          <li style="width: 150px;">
+            共{{pagination.pages}}页，{{pagination.hits}}条记录
+          </li>
+      </ul>
+
+    </div>
+<script>
+        function re_table(url){
+        $.ajax({
+              type: "get",
+              dataType: "json",
+              url: url,
+              success: function (data) {
+                  $("#table").html(data.table_html);
+              }
+
+          });
+      }
+</script>
