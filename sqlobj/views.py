@@ -111,14 +111,14 @@ def getquestion(num):
     if not question_obj:
         logger.warning("Question未查到数据")
         return {"question": "", "id": 0, "questionclass": ''}
-    if question_obj.id < question_id:
+    if question_obj.number < question_id:
         text = '你刷完所有题目咯。'
-        id = question_obj.id
+        id = question_obj.number
         return {"question": text, "id": id, 'questionclass': 3}
     try:
-        obj = Question.objects.get(id=question_id)
+        obj = Question.objects.get(number=question_id)
         text = obj.text
-        id = obj.id
+        id = obj.number
         qclass = obj.qclass
     except:
         text = '对不起，没有这道题。'

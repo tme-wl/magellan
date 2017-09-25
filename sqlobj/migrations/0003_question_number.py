@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sqlobj', '0005_auto_20170324_1709'),
+        ('sqlobj', '0002_auto_20170922_1809'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='question',
-            name='type',
-            field=models.IntegerField(default=0, choices=[(1, '基础操作'), (2, '进阶练习')], verbose_name='题目类型'),
+            name='number',
+            field=models.IntegerField(verbose_name='排序ID', default=1),
         ),
     ]

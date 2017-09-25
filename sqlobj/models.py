@@ -23,21 +23,22 @@ class MyStudent(models.Model):
         db_table = 'student'
 
 
-class MyTeacher(models.Model):
-    """老师表"""
-    tname = models.CharField("姓名", max_length=3)
-
-    class Meta:
-        db_table = 'teacher'
-
-
 class MyCourse(models.Model):
     """课程表"""
     cname = models.CharField("课程", max_length=3)
-    myteacher = models.ForeignKey(MyTeacher)
 
     class Meta:
         db_table = 'course'
+
+
+class MyTeacher(models.Model):
+    """老师表"""
+    tname = models.CharField("姓名", max_length=3)
+    # 老师教的课程
+    mycourse = models.ForeignKey(MyCourse)
+
+    class Meta:
+        db_table = 'teacher'
 
 
 class MyScore(models.Model):
@@ -63,10 +64,11 @@ class Question(models.Model):
     CHOICE = ((1, 'A'), (2, 'B'))
     text = models.CharField("题目", max_length=300)
     # 难度级别，可让用户选择
+    number = models.IntegerField("排序ID", default=1)
     difficulty = models.IntegerField('难度等级', default=0)
     answernumber = models.IntegerField('答案个数', default=0)
     theanswer = models.CharField('答案', max_length=100)
-    answersql = models.CharField('sql语句', max_length=300, default='')
+    answersql = models.CharField('sql语句', max_length=5000, default='')
     qclass = models.IntegerField('题目类型', choices=QCLASS, default=1)
     thechoice = models.IntegerField('选择', choices=CHOICE, default=1)
     achoice = models.CharField('A选项', max_length=20, default='')

@@ -8,13 +8,6 @@ import sys
 
 logger = logging.getLogger("magellan")
 
-print(sys.getdefaultencoding())
-
-"""
-六个年级，每个年级六个班，每个班500-600人，每个学生十三门课,(十门必修三门选修)，每门课共五次考试。
-每个老师教一门学科的三个班。
-"""
-
 first_name = [
     '赵', '钱', '孙', '李', '周', '吴', '郑', '王', '李', '张', '刘',
     '冯', '陈', '蒋', '沈', '韩', '杨', '王', '李', '张', '刘',
@@ -89,7 +82,7 @@ def choice_name():
 def create_class():
     """创建class表"""
     logger.info("create class data")
-    MyClass.objects.bulk_create([MyClass(caption=the_class) for the_class in my_class])
+    MyClass.objects.bulk_create([MyClass(caption=my_class[i]) for i in range(len(my_class))])
     logger.info("create class end")
 
 
@@ -98,6 +91,7 @@ def create_student():
     logger.info("create student data")
     student_obj = []
     my_class = MyClass.objects.all()
+    id = 1
     for cla in my_class:
         for st in range(random.randint(20, 25)):
             # 一个班30 - 40人
@@ -112,8 +106,14 @@ def create_teacher():
     course_required 必修课 全校每门必修课安排6个老师
     """
     logger.info("create teacher data")
-    MyTeacher.objects.bulk_create(
-        [MyTeacher(tname=choice_name()) for x in range(len(course_required) * 6)])
+    id = 1
+    teacher = []
+    for co in course_required:
+        coid = MyCourse.objects.get(cname=co).id
+        for i in range(6):
+            teacher.append(MyTeacher(tname=choice_name(), mycourse_id=coid))
+            id += 1
+    MyTeacher.objects.bulk_create(teacher)
     logger.info("create teacher end")
 
 
@@ -123,13 +123,11 @@ def create_course():
 
     """
     logger.info("create course data")
-    teachers = MyTeacher.objects.all()
     course = []
-    number = 0
+    id = 1
     for co in course_required:
-        for i in range(6):
-            course.append(MyCourse(cname=co, myteacher_id=teachers[number].id))
-            number += 1
+        course.append(MyCourse(cname=co))
+        id += 1
     MyCourse.objects.bulk_create(course)
     logger.info("create course end")
 
@@ -143,6 +141,7 @@ def create_score():
     students = MyStudent.objects.all()
     courses = MyCourse.objects.all()
     score = []
+    id = 1
     for st in students:
         # 学生
         for co in courses:
@@ -158,350 +157,18 @@ class Command(BaseCommand):
     """把QUESTION_ANSWER里的问题和答案导入到数据库里，去掉重复的和已经导入的"""
     def handle(self, *args, **options):
         """"""
+        print("delete data")
+        MyClass.objects.all().delete()
+        MyCourse.objects.all().delete()
+        MyTeacher.objects.all().delete()
+        MyStudent.objects.all().delete()
+        MyScore.objects.all().delete()
         print("run create_teacher")
         a = time.time()
         create_class()
         create_student()
-        create_teacher()
         create_course()
+        create_teacher()
         create_score()
         print(time.time() - a)
         print("end create_teacher")
-
-
-# def create_class_csv1():
-#     """创建clss表"""
-#     print('create class data')
-#     with open(class_path, 'w') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(("id", "caption"))
-#         temp = []
-#         id_number = 1
-#         for the_class in my_class:
-#             temp.append((str(id_number), the_class))
-#             id_number += 1
-#         writer.writerows(temp)
-#     print('end create data')
-
-#
-# def create_class(cur):
-#     pass
-#
-#
-# def create_class1(cur):
-#     """插入年级数据"""
-#     print("create class data")
-#     class_name = []
-#     temp = []
-#     for the_class in my_class:
-#         temp.append("('" + the_class + "'),")
-#         class_name.append(the_class)
-#     temp[-1] = temp[-1][:-1]
-#     sql = "insert into class (caption) values %s " % (" ".join(temp))
-#     print(sql)
-#     cur.execute(sql)
-#     print("end create data")
-
-
-# def create_student_csv(cur):
-#     sex = ['男', '女']
-#     sql = "select id,caption from class"
-#     cur.execute(sql)
-#     print("create student data")
-#     classdata = cur.fetchall()
-#     with open(student_path, 'w') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(("id", "sname", "gender", "myclass_id"))
-#         id_number = 1
-#         for one in classdata:
-#             temp = []
-#             for i in range(random.randint(300, 400)):
-#                 temp.append((id_number, choice_name(), random.choice(sex), one[0]))
-#                 id_number += 1
-#             writer.writerows(temp)
-#     print("end create data")
-#
-#
-# def create_student1(cur):
-#     """插入学生数据"""
-#     sex = ['男', '女']
-#     sql = "select id,caption from class"
-#     cur.execute(sql)
-#     print("create student data")
-#     classdata = cur.fetchall()
-#     for one in classdata:
-#         for i in range(random.randint(300, 400)):
-#             sql = "insert into student (sname,gender,myclass_id) values ('%s','%s',%d)" % (
-#             choice_name(), random.choice(sex), one[0])
-#             print(sql)
-#             cur.execute(sql)
-#     print("end create data")
-
-#
-# def create_teacher_csv():
-#     print("create teacher data")
-#     temp = []
-#     id_number = 1
-#     while len(temp) < (len(course_required) + len(course_elective)) * 6 * 2:
-#         temp.append((id_number, choice_name()))
-#         id_number += 1
-#     with open(teacher_path, 'w') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(("id", "tname"))
-#         writer.writerows(temp)
-#     print('end create data')
-#
-#
-# def create_teacher(cur):
-#     """插入老师数据"""
-#     print("create teacher data")
-#     temp = []
-#     teacher_name = []
-#     while len(temp) < (len(course_required) + len(course_elective)) * 6 * 2:
-#         # 一个学科老师教三个班，一个年级要13*2个老师，六个年级
-#         teacher = choice_name()
-#         if teacher not in temp:
-#             temp.append("('" + teacher + "'),")
-#             teacher_name.append(teacher)
-#     temp[-1] = temp[-1][:-1]
-#     sql = "insert into teacher (tname) values %s " % (" ".join(temp))
-#     print(sql)
-#     cur.execute(sql)
-#     print("end create data")
-#
-#
-# def create_cource_csv(cur):
-#     sql = "select id, tname from teacher"
-#     cur.execute(sql)
-#     allteacher = cur.fetchall()
-#     print("create course data")
-#     number = 0
-#     course_number = 0
-#     id_number = 1
-#     course = course_required + course_elective
-#     temp = []
-#     for t in allteacher:
-#         temp.append((id_number, course[course_number], t[0]))
-#         id_number += 1
-#         # sql = "insert into course(cname,myteacher_id) values ('%s', %d)" % (course[course_number], t[0])
-#         # print(sql)
-#         # cur.execute(sql)
-#         number += 1
-#         if number == 12:
-#             number = 0
-#             course_number += 1
-#     with open(source_path, 'w') as csvfile:
-#         writer = csv.writer(csvfile)
-#         writer.writerow(("id", "cname", 'myteacher_id'))
-#         writer.writerows(temp)
-#     print("end create data")
-#
-#
-# def create_course(cur):
-#     """插入课程表"""
-#     sql = "select id, tname from teacher"
-#     cur.execute(sql)
-#     allteacher = cur.fetchall()
-#     print("create course data")
-#     number = 0
-#     course_number = 0
-#     course = course_required + course_elective
-#     for t in allteacher:
-#         sql = "insert into course(cname,myteacher_id) values ('%s', %d)" % (course[course_number], t[0])
-#         print(sql)
-#         cur.execute(sql)
-#         number += 1
-#         if number == 12:
-#             number = 0
-#             course_number += 1
-#     print("end create data")
-
-
-# def create_score_csv(cur):
-#     coursesql = "select id, cname, myteacher_id from course order by cname"
-#     cur.execute(coursesql)
-#     courseobj = cur.fetchall()
-#     coursedict = {}
-#     for co in courseobj:
-#         if co[1] not in coursedict:
-#             coursedict[co[1]] = [co[0], co[0], co[0]]
-#         else:
-#             coursedict[co[1]].append(co[0])
-#             coursedict[co[1]].append(co[0])
-#             coursedict[co[1]].append(co[0])
-#     '''
-#     coursedict={
-#         '语文'：[老师1，老师1，老师1，老师2，老师2，老师2]
-#         ...
-#     }
-#     '''
-#     course_teacher_dict = {}
-#     for c in course_elective + course_required:
-#         for cl in my_class:
-#             course_teacher_dict[(c, cl)] = coursedict[c].pop()
-#     '''
-#     course_teacher_dict={
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年二班)'：'老师2'，
-#         ...
-#     }
-#     '''
-#     classsql = "select id,caption from class"
-#     cur.execute(classsql)
-#     classobj = cur.fetchall()
-#     csvfile = open(score_path, 'w')
-#     writer = csv.writer(csvfile)
-#     writer.writerow(("id", "test", 'number', 'mycourse_id', 'myteacher_id'))
-#     id_number = 1
-#     for cla in classobj:
-#         # 每个班级
-#         studentsql = "select id, sname, myclass_id from student where myclass_id = %d" % cla[0]
-#         cur.execute(studentsql)
-#         studentobj = cur.fetchall()
-#         print("class %d" % cla[0])
-#         for stu in studentobj:
-#             # 每个学生
-#             temp = []
-#             print("student %s" % stu[1])
-#             for co in course_required:
-#                 # 必修课
-#                 course_id = course_teacher_dict[(co, cla[1])]
-#                 for t in exam_name:
-#                     tempson = (id_number, t, random.randint(50, 100), course_id, stu[0])
-#                     id_number += 1
-#                     temp.append(tempson)
-#
-#             for co in random.sample(course_elective, 3):
-#                 course_id = course_teacher_dict[(co, cla[1])]
-#                 for t in exam_name:
-#                     tempson = (id_number, t, random.randint(50, 100), course_id, stu[0])
-#                     id_number += 1
-#                     temp.append(tempson)
-#             writer.writerows(temp)
-#     csvfile.close()
-#
-#
-# def create_score(cur):
-#     coursesql = "select id, cname, myteacher_id from course order by cname"
-#     cur.execute(coursesql)
-#     courseobj = cur.fetchall()
-#     coursedict = {}
-#     for co in courseobj:
-#         if co[1] not in coursedict:
-#             coursedict[co[1]] = [co[0], co[0], co[0]]
-#         else:
-#             coursedict[co[1]].append(co[0])
-#             coursedict[co[1]].append(co[0])
-#             coursedict[co[1]].append(co[0])
-#     '''
-#     coursedict={
-#         '语文'：[老师1，老师1，老师1，老师2，老师2，老师2]
-#         ...
-#     }
-#     '''
-#     course_teacher_dict = {}
-#     for c in course_elective + course_required:
-#         for cl in my_class:
-#             course_teacher_dict[(c, cl)] = coursedict[c].pop()
-#     '''
-#     course_teacher_dict={
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年一班)'：'老师1'，
-#         '(语文，一年二班)'：'老师2'，
-#         ...
-#     }
-#     '''
-#
-#     classsql = "select id,caption from class"
-#     cur.execute(classsql)
-#     classobj = cur.fetchall()
-#     for cla in classobj:
-#         # 每个班级
-#         studentsql = "select id, sname, myclass_id from student where myclass_id = %d" % cla[0]
-#         cur.execute(studentsql)
-#         studentobj = cur.fetchall()
-#         print("class %d" % cla[0])
-#
-#         for stu in studentobj:
-#             # 每个学生
-#             print("student %s" % stu[1])
-#             for co in course_required:
-#                 # 必修课
-#                 course_id = course_teacher_dict[(co, cla[1])]
-#                 for t in exam_name:
-#                     sql = """insert into score(mystudent_id, mycourse_id, test,number) values (%d, %d, '%s', %d)
-#                     """ % (stu[0], course_id, t, random.randint(50, 100))
-#                     try:
-#                         cur.execute(sql)
-#                     except Exception as e:
-#                         print(sql)
-#                         print(e)
-#             for co in random.sample(course_elective, 3):
-#                 course_id = course_teacher_dict[(co, cla[1])]
-#                 for t in exam_name:
-#                     sql = """insert into score(mystudent_id, mycourse_id, test,number) values (%d, %d, '%s', %d)
-#                     """ % (stu[0], course_id, t, random.randint(50, 100))
-#                     try:
-#                         cur.execute(sql)
-#                     except Exception as e:
-#                         print(sql)
-#                         print(e)
-#
-#
-# def main1():
-#     con = connections["default"]
-#     cur = con.cursor()
-#
-#     create_teacher(cur)
-#     create_course(cur)
-#     create_class(cur)
-#     create_student(cur)
-#     create_score(cur)
-#
-#     if cur:
-#         cur.close()
-#     if con:
-#         con.close()
-#
-#
-# def main2():
-#     con = connections["default"]
-#     cur = con.cursor()
-#
-#     create_class_csv()
-#     create_student_csv(cur)
-#     create_teacher_csv()
-#     create_cource_csv(cur)
-#     create_score_csv(cur)
-#
-#     if cur:
-#         cur.close()
-#     if con:
-#         con.close()
-#
-#
-# def run():
-#     import time
-#     T = time.time()
-#     try:
-#         main2()
-#         print('okkkk')
-#     except Exception as e:
-#         print(e)
-#     print(time.time() - T)
-
-
-
-# docker run -d -p 222:22 -p 7331:7331 --name arachni -e SERVER_ROOT_PASSWORD="DockerArachniPWD"  -e ARACHNI_PARAMS="" qssec:arachni
-#
-#
-# -e ARACHNI_PARAMS="--authentication-username arachni --authentication-password Pass123 --only-positives"
-#
-# docker run -d -p 223:22 -p 7335:7331 -p 9299:9292 --name arachni1 -e SERVER_ROOT_PASSWORD="DockerArachniPWD"  -e ARACHNI_PARAMS="" arachni/arachni:latest
-
-
-
-
